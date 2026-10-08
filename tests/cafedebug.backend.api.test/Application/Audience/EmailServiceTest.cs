@@ -4,6 +4,7 @@ using cafedebug_backend.domain.Messages.Email.Request;
 using cafedebug_backend.infrastructure.Constants;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Shouldly;
 using Xunit;
 
 namespace cafedebug.backend.api.test.Application.Audience;
@@ -63,13 +64,13 @@ public class EmailServiceTest
         var mailMessage = await emailService.ConfigureEmailAsync(emailRequest);
 
         // Assert
-        Assert.NotNull(mailMessage);
-        Assert.Equal(emailRequest.Subject, mailMessage.Subject);
-        Assert.Equal(emailRequest.EmailTo, mailMessage.To[0].Address);
-        Assert.Equal(emailRequest.EmailCopy, mailMessage.CC[0].Address);
-        Assert.Contains(emailRequest.Name, mailMessage.Body);
-        Assert.Contains(emailRequest.MessageBody, mailMessage.Body);
-        Assert.Contains(emailRequest.EmailFrom, mailMessage.Body);
+        mailMessage.ShouldNotBeNull();
+        mailMessage.Subject.ShouldBe(emailRequest.Subject);
+        mailMessage.To[0].Address.ShouldBe(emailRequest.EmailTo);
+        mailMessage.CC[0].Address.ShouldBe(emailRequest.EmailCopy);
+        mailMessage.Body.ShouldContain(emailRequest.Name);
+        mailMessage.Body.ShouldContain(emailRequest.MessageBody);
+        mailMessage.Body.ShouldContain(emailRequest.EmailFrom);
     }
 
     [Fact]
@@ -92,11 +93,11 @@ public class EmailServiceTest
         var mailMessage = await emailService.ConfigureEmailRecoveryPasswordAsync(emailRequest);
 
         // Assert
-        Assert.NotNull(mailMessage);
-        Assert.Equal(emailRequest.Subject, mailMessage.Subject);
-        Assert.Equal(emailRequest.EmailTo, mailMessage.To[0].Address);
-        Assert.Equal(emailRequest.EmailCopy, mailMessage.CC[0].Address);
-        Assert.Contains("recuper", mailMessage.Body, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains(InsfrastructureConstants.ForgotPasswordUrl, mailMessage.Body);
+        mailMessage.ShouldNotBeNull();
+        mailMessage.Subject.ShouldBe(emailRequest.Subject);
+        mailMessage.To[0].Address.ShouldBe(emailRequest.EmailTo);
+        mailMessage.CC[0].Address.ShouldBe(emailRequest.EmailCopy);
+        mailMessage.Body.ShouldContain("recupera��o de senha");
+        mailMessage.Body.ShouldContain(InsfrastructureConstants.ForgotPasswordUrl);
     }
 }
